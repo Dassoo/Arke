@@ -8,7 +8,7 @@
 
 Arke is a small personal project focused on building a local high-performance RAG system by combining some of the most modern and efficient tools and libraries available.
 
-> Note: As a design choice, chat threads lack persistence across backend resets. Only document storage caching, along with document and query caching, is retained. This accommodates users who often open chats and forget about them, automatically cleaning up excess information.
+> Note: As a design choice, chat threads lack persistence across backend resets. Only document storage and cached embeddings, along with document and query caching, are retained. This accommodates users who often open chats and forget about them, automatically cleaning up excess information.
 
 ## Table of Contents
 
