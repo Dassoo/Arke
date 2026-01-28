@@ -6,7 +6,7 @@
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE.txt)
 [!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/dassoo)
 
-<video src="https://raw.githubusercontent.com/Dassoo/Arke/main/demo.mp4" width="640" height="480" controls></video>
+<video src="https://raw.githubusercontent.com/Dassoo/Arke/blob/main/demo.mp4" width="640" height="480" controls></video>
 
 Arke is a small personal project focused on building a local high-performance RAG system by combining some of the most modern and efficient tools and libraries available.
 
