@@ -1,8 +1,9 @@
 'use client';
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Streamdown } from 'streamdown';
 import remarkGfm from 'remark-gfm';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   Forward,
   Wind,
@@ -31,6 +32,7 @@ interface Message {
   role: 'user' | 'assistant';
   content: string;
   responseTime?: number;
+  isStreaming?: boolean;
 }
 
 function generateUUID(): string {
@@ -39,6 +41,85 @@ function generateUUID(): string {
     const v = c === 'x' ? r : (r & 0x3 | 0x8);
     return v.toString(16);
   });
+}
+
+// Typing cursor component for streaming effect
+function StreamingCursor() {
+  return (
+    <span className="inline-block w-2 h-5 ml-0.5 bg-[var(--accent-primary)] animate-pulse rounded-sm" />
+  );
+}
+
+// Animated text component that reveals content character by character
+function AnimatedStreamContent({ 
+  content, 
+  isStreaming 
+}: { 
+  content: string; 
+  isStreaming: boolean;
+}) {
+  const [displayedContent, setDisplayedContent] = useState(content);
+  const [isComplete, setIsComplete] = useState(!isStreaming);
+  const contentRef = useRef(content);
+  const animationRef = useRef<number | null>(null);
+  const charIndexRef = useRef(0);
+
+  useEffect(() => {
+    if (!isStreaming) {
+      setDisplayedContent(content);
+      setIsComplete(true);
+      return;
+    }
+
+    // When streaming, we want to smoothly reveal new characters
+    const newContent = content;
+    const currentContent = contentRef.current;
+    
+    if (newContent.length > currentContent.length) {
+      // New content arrived - animate the addition
+      const charsToAdd = newContent.slice(currentContent.length);
+      let charIndex = 0;
+      
+      const animateChars = () => {
+        if (charIndex < charsToAdd.length) {
+          const batchSize = Math.min(3, charsToAdd.length - charIndex); // Add up to 3 chars at once for smoother feel
+          charIndex += batchSize;
+          contentRef.current = newContent.slice(0, currentContent.length + charIndex);
+          setDisplayedContent(contentRef.current);
+          animationRef.current = requestAnimationFrame(animateChars);
+        } else {
+          contentRef.current = newContent;
+          setDisplayedContent(newContent);
+        }
+      };
+      
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current);
+      }
+      animationRef.current = requestAnimationFrame(animateChars);
+    } else {
+      contentRef.current = newContent;
+      setDisplayedContent(newContent);
+    }
+
+    return () => {
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current);
+      }
+    };
+  }, [content, isStreaming]);
+
+  return (
+    <div className="relative">
+      <Streamdown
+        className="prose prose-headings:font-[var(--font-montserrat-alternates)] max-w-none"
+        remarkPlugins={[remarkGfm]}
+      >
+        {displayedContent}
+      </Streamdown>
+      {isStreaming && !isComplete && <StreamingCursor />}
+    </div>
+  );
 }
 
 export default function Home() {
@@ -56,7 +137,6 @@ export default function Home() {
 
   useEffect(() => {
     fetchThreads();
-    // Check for saved theme preference
     const savedTheme = localStorage.getItem('theme');
     if (savedTheme === 'dark') {
       setIsDarkMode(true);
@@ -190,24 +270,24 @@ export default function Home() {
         accumulated += decoder.decode(value, { stream: true });
 
         if (!assistantMessageAdded && accumulated.trim()) {
-          setMessages(prev => [...prev, { role: 'assistant', content: accumulated }]);
+          setMessages(prev => [...prev, { role: 'assistant', content: accumulated, isStreaming: true }]);
           assistantMessageAdded = true;
         } else if (assistantMessageAdded) {
           setMessages(prev => prev.map((msg, i) =>
             i === prev.length - 1 && msg.role === 'assistant'
-              ? { ...msg, content: accumulated }
+              ? { ...msg, content: accumulated, isStreaming: true }
               : msg
           ));
         }
       }
 
+      // Mark streaming as complete
       setMessages(prev => prev.map((msg, i) =>
         i === prev.length - 1 && msg.role === 'assistant'
-          ? { ...msg, responseTime: finalResponseTime }
+          ? { ...msg, responseTime: finalResponseTime, isStreaming: false }
           : msg
       ));
 
-      // Refresh threads list to show updated timestamp
       fetchThreads();
     } catch (error) {
       console.error('Error:', error);
@@ -215,7 +295,8 @@ export default function Home() {
       setMessages(prev => [...prev, {
         role: 'assistant',
         content: 'Sorry, there was an error processing your message.',
-        responseTime: responseTime
+        responseTime: responseTime,
+        isStreaming: false
       }]);
     } finally {
       setIsLoading(false);
@@ -491,58 +572,94 @@ export default function Home() {
                 Start the conversation by sending a message below.
               </div>
             )}
-            {messages.map((message, index) => (
-              <div
-                key={index}
-                className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'} animate-in fade-in slide-in-from-bottom-2 duration-300`}
-                style={{ animationDelay: `${index * 50}ms` }}
-              >
-                <div
-                  className={`max-w-[100%] ${message.role === 'user'
-                    ? 'bg-[var(--accent-primary)] text-background rounded-2xl rounded-tr-sm'
-                    : 'bg-[var(--surface-primary)] border border-[var(--border-primary)] text-[var(--text-primary)]/80 rounded-2xl rounded-tl-sm'
-                    } px-6 py-4 shadow-[var(--shadow-sm)]`}
+            <AnimatePresence initial={false}>
+              {messages.map((message, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ 
+                    duration: 0.4, 
+                    ease: [0.25, 0.46, 0.45, 0.94],
+                    delay: index === messages.length - 1 ? 0 : 0 
+                  }}
+                  className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
                 >
-                  {message.role === 'assistant' && (
-                    <div className="flex items-center gap-2 mb-3 pb-2 border-b border-[var(--border-primary)]">
-                      <img src="/arke-icon.png" className="w-5 h-5 rounded-full unselectable" alt="Arke" />
-                      <span className="text-xs font-medium unselectable text-[var(--text-secondary)]">Arke Assistant</span>
-                    </div>
-                  )}
+                  <div
+                    className={`max-w-[100%] ${message.role === 'user'
+                      ? 'bg-[var(--accent-primary)] text-background rounded-2xl rounded-tr-sm'
+                      : 'bg-[var(--surface-primary)] border border-[var(--border-primary)] text-[var(--text-primary)]/80 rounded-2xl rounded-tl-sm'
+                      } px-6 py-4 shadow-[var(--shadow-sm)]`}
+                  >
+                    {message.role === 'assistant' && (
+                      <div className="flex items-center gap-2 mb-3 pb-2 border-b border-[var(--border-primary)]">
+                        <img src="/arke-icon.png" className="w-5 h-5 rounded-full unselectable" alt="Arke" />
+                        <span className="text-xs font-medium unselectable text-[var(--text-secondary)]">Arke Assistant</span>
+                      </div>
+                    )}
 
-                  <div className="prose prose-sm max-w-none">
-                    <Streamdown
-                      className="prose prose-headings:font-[var(--font-montserrat-alternates)] max-w-none"
-                      remarkPlugins={[remarkGfm]}
-                    >
-                      {message.content}
-                    </Streamdown>
+                    <div className="prose prose-sm max-w-none">
+                      {message.role === 'assistant' ? (
+                        <AnimatedStreamContent 
+                          content={message.content} 
+                          isStreaming={message.isStreaming || false} 
+                        />
+                      ) : (
+                        <Streamdown
+                          className="prose prose-headings:font-[var(--font-montserrat-alternates)] max-w-none"
+                          remarkPlugins={[remarkGfm]}
+                        >
+                          {message.content}
+                        </Streamdown>
+                      )}
+                    </div>
+
+                    {message.responseTime && message.role === 'assistant' && (
+                      <motion.div 
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ delay: 0.3 }}
+                        className="mt-3 pt-2 border-t border-[var(--border-primary)] flex items-center gap-1 text-xs text-[var(--text-muted)]"
+                      >
+                        <Zap className="w-3 h-3" />
+                        Response time: {(message.responseTime / 1000).toFixed(2)}s
+                      </motion.div>
+                    )}
                   </div>
-
-                  {message.responseTime && message.role === 'assistant' && (
-                    <div className="mt-3 pt-2 border-t border-[var(--border-primary)] flex items-center gap-1 text-xs text-[var(--text-muted)]">
-                      <Zap className="w-3 h-3" />
-                      Response time: {(message.responseTime / 1000).toFixed(2)}s
-                    </div>
-                  )}
-                </div>
-              </div>
-            ))}
+                </motion.div>
+              ))}
+            </AnimatePresence>
 
             {isLoading && (
-              <div className="flex justify-start animate-in fade-in duration-300">
+              <motion.div 
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="flex justify-start"
+              >
                 <div className="bg-[var(--surface-primary)] border border-[var(--border-primary)] rounded-2xl rounded-tl-sm px-6 py-4 shadow-[var(--shadow-sm)]">
                   <div className="flex items-center gap-3">
                     <img src="/arke-icon.png" className="w-5 h-5 rounded-full unselectable" alt="Arke" />
                     <div className="flex items-center gap-1">
-                      <div className="w-2 h-2 bg-[var(--text-muted)] rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
-                      <div className="w-2 h-2 bg-[var(--text-muted)] rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
-                      <div className="w-2 h-2 bg-[var(--text-muted)] rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+                      <motion.div 
+                        className="w-2 h-2 bg-[var(--text-muted)] rounded-full"
+                        animate={{ y: [0, -6, 0] }}
+                        transition={{ duration: 0.8, repeat: Infinity, delay: 0 }}
+                      />
+                      <motion.div 
+                        className="w-2 h-2 bg-[var(--text-muted)] rounded-full"
+                        animate={{ y: [0, -6, 0] }}
+                        transition={{ duration: 0.8, repeat: Infinity, delay: 0.15 }}
+                      />
+                      <motion.div 
+                        className="w-2 h-2 bg-[var(--text-muted)] rounded-full"
+                        animate={{ y: [0, -6, 0] }}
+                        transition={{ duration: 0.8, repeat: Infinity, delay: 0.3 }}
+                      />
                     </div>
                     <span className="text-sm text-[var(--text-secondary)]">Thinking...</span>
                   </div>
                 </div>
-              </div>
+              </motion.div>
             )}
           </div>
         </div>
