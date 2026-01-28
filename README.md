@@ -81,6 +81,8 @@ Arke is a small personal project focused on building a local high-performance RA
 1. **Start the FastAPI server:**
    ```bash
    python src/main.py
+   # or if using uv
+   uv run python src/main.py
    ```
 
 ### Frontend Application
