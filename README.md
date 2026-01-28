@@ -94,7 +94,7 @@ Arke is a small personal project focused on building a local high-performance RA
 
 
 2. **Interact with the system:**
-   - **Store documents**: Specify folder paths with the documents to add
+   - **Store documents**: Specify folder paths with the documents to add (providing a sample in 'data/greece_dataset')
    - **Query knowledge base**: Ask questions about stored documents
    - **Manage documents**: View, delete stored documents or flush the database
 
