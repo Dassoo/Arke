@@ -1,0 +1,132 @@
+@import "tailwindcss";
+@source "../../node_modules/streamdown/dist/*.js";
+
+:root {
+  --background: #fafafa;
+  --foreground: #0a0a0a;
+  
+  /* Surface colors */
+  --surface-primary: #ffffff;
+  --surface-secondary: #f5f5f5;
+  --surface-tertiary: #e5e5e5;
+  
+  /* Text hierarchy */
+  --text-primary: #0a0a0a;
+  --text-secondary: #525252;
+  --text-tertiary: #737373;
+  --text-muted: #a3a3a3;
+  
+  /* Border colors */
+  --border-primary: #e5e5e5;
+  --border-secondary: #d4d4d4;
+  --border-hover: #a3a3a3;
+  
+  /* Accent */
+  --accent-primary: #262626;
+  --accent-secondary: #404040;
+  --accent-hover: #171717;
+  
+  /* Status colors */
+  --success: #16a34a;
+  --warning: #ca8a04;
+  --error: #dc2626;
+  
+  /* Shadows */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+}
+
+/* Dark Theme */
+[data-theme="dark"] {
+  --background: #0a0a0a;
+  --foreground: #fafafa;
+  
+  /* Surface colors */
+  --surface-primary: #171717;
+  --surface-secondary: #262626;
+  --surface-tertiary: #404040;
+  
+  /* Text hierarchy */
+  --text-primary: #fafafa;
+  --text-secondary: #a3a3a3;
+  --text-tertiary: #737373;
+  --text-muted: #525252;
+  
+  /* Border colors */
+  --border-primary: #262626;
+  --border-secondary: #404040;
+  --border-hover: #525252;
+  
+  /* Accent */
+  --accent-primary: #e5e5e5;
+  --accent-secondary: #d4d4d4;
+  --accent-hover: #ffffff;
+  
+  /* Status colors */
+  --success: #22c55e;
+  --warning: #eab308;
+  --error: #ef4444;
+  
+  /* Shadows */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.3);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.4), 0 2px 4px -2px rgb(0 0 0 / 0.4);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.5), 0 4px 6px -4px rgb(0 0 0 / 0.5);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-surface-primary: var(--surface-primary);
+  --color-surface-secondary: var(--surface-secondary);
+  --color-surface-tertiary: var(--surface-tertiary);
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-tertiary: var(--text-tertiary);
+  --color-text-muted: var(--text-muted);
+  --color-border-primary: var(--border-primary);
+  --color-border-secondary: var(--border-secondary);
+  --color-accent-primary: var(--accent-primary);
+  --color-accent-secondary: var(--accent-secondary);
+  --font-sans: var(--font-cabin);
+  --font-mono: var(--font-geist-mono);
+  --font-cabin: var(--font-cabin);
+  --font-montserrat-alternates: var(--font-montserrat-alternates);
+  --font-poppins: var(--font-poppins);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-cabin), Arial, Helvetica, sans-serif;
+}
+
+h1.text-4xl.font-bold {
+  font-family: var(--font-montserrat-alternates), Arial, Helvetica, sans-serif;
+}
+
+.logo-title {
+  font-family: var(--font-montserrat-alternates), Arial, Helvetica, sans-serif;
+}
+
+.unselectable {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  cursor: default;
+}
+
+/* Streamdown download dropdown fix */
+[data-streamdown="table-wrapper"] .absolute.top-full.right-0.z-10 {
+  background-color: var(--surface-primary) !important;
+}
+
+[data-streamdown="table-wrapper"] .absolute.top-full.right-0.z-10 button {
+  color: var(--text-primary) !important;
+}
+
+[data-streamdown="table-wrapper"] .absolute.top-full.right-0.z-10 button:hover {
+  background-color: var(--surface-secondary) !important;
+}
