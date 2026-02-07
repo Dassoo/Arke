@@ -32,9 +32,8 @@ Arke is a small personal project focused on building a local high-performance RA
 
 ## Prerequisites
 
-- Python 3.12 or higher
-- OpenAI API key
-- Docker
+- [OpenAI API key](https://platform.openai.com/settings/organization/api-keys)
+- [Docker](https://www.docker.com/products/docker-desktop/)
 
 ## Installation
 
@@ -57,7 +56,7 @@ Arke is a small personal project focused on building a local high-performance RA
 
 
 3. **Start Docker:**
-   A `docker-compose.yml` file is provided to spin up both the necessary instances:
+   A `docker-compose.yml` file is provided to spin up both the necessary instances from your terminal:
 
    ```bash
    docker compose up -d
