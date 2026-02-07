@@ -33,7 +33,6 @@ Arke is a small personal project focused on building a local high-performance RA
 ## Prerequisites
 
 - Python 3.12 or higher
-- Node.js 18+
 - OpenAI API key
 - Docker
 
@@ -45,27 +44,7 @@ Arke is a small personal project focused on building a local high-performance RA
    cd arke
    ```
 
-2. **Install Python dependencies:**
-   ```bash
-   pip install -r requirements.txt
-   # or if using uv
-   uv sync
-   ```
-
-3. **Install frontend dependencies:**
-   ```bash
-   cd frontend
-   npm install
-   ```
-
-4. **Start vector databases with Docker:**
-   A `docker-compose.yml` file is provided to spin up both Redis and Qdrant instances:
-
-   ```bash
-   docker compose up -d
-   ```
-
-5. **Set up environment variables:**
+2. **Set up environment variables:**
    Copy `.env.example` to `.env` and fill in your values:
    ```bash
    cp .env.example .env
@@ -76,29 +55,24 @@ Arke is a small personal project focused on building a local high-performance RA
    - `REDIS_URL`: Redis connection URL (default:  `redis://localhost:6379`)
    - `QDRANT_URL`: Qdrant connection URL (default:  `http://localhost:6333`)
 
+
+3. **Start Docker:**
+   A `docker-compose.yml` file is provided to spin up both the necessary instances:
+
+   ```bash
+   docker compose up -d
+   ```
+
+
 ## Usage
 
-### Backend Server
+> Note: The application may take up to ~30 seconds to connect on startup. Check the status bar on the bottom left.
 
-1. **Start the FastAPI server:**
-   ```bash
-   python src/main.py
-   # or if using uv
-   uv run python src/main.py
-   ```
-
-### Frontend Application
-
-1. **Start the Next.js development server:**
-   ```bash
-   cd frontend
-   npm run dev
-   ```
-   The frontend will be available at `http://localhost:3000`
+The RAG will be available at `http://localhost:3000` on your browser.
 
 
 2. **Interact with the system:**
-   - **Store documents**: Specify folder paths with the documents to add (providing a sample in 'data/greece_dataset')
+   - **Store documents**: Specify local folder paths with the documents to add (providing a sample in 'data/greece_dataset')
    - **Query knowledge base**: Ask questions about stored documents
    - **Manage documents**: View, delete stored documents or flush the database
 

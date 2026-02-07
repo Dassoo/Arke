@@ -2,7 +2,7 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter, TokenTextSp
 from langchain_core.documents import Document
 from kreuzberg import batch_extract_files_sync, ExtractionConfig, OcrConfig
 
-from core.config import settings
+from src.core.config import settings
 
 from collections import defaultdict
 from pathlib import Path

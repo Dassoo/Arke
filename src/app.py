@@ -1,16 +1,15 @@
-# src/main.py
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from langgraph.checkpoint.memory import InMemorySaver
 from langchain.agents import create_agent
-import uvicorn
+# import uvicorn
 
-from core.cache import init_llm_cache
-from core.prompts import RAG_AGENT_PROMPT
-from core.config import settings, config_model
-from core.api.chat import router as chat_router, init_chat_dependencies
-from agents.middleware import custom_middleware
-from agents import tools
+from src.core.cache import init_llm_cache
+from src.core.prompts import RAG_AGENT_PROMPT
+from src.core.config import settings, config_model
+from src.core.api.chat import router as chat_router, init_chat_dependencies
+from src.agents.middleware import custom_middleware
+from src.agents import tools
 
 
 def validate_env(settings):
@@ -46,6 +45,7 @@ app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -53,11 +53,11 @@ app.add_middleware(
 app.include_router(chat_router)
 
 
-if __name__ == "__main__":
-    uvicorn.run(
-        "main:app",
-        host="0.0.0.0",
-        port=8000,
-        reload=True,
-        app_dir="src",
-    )
+# if __name__ == "__main__":
+#     uvicorn.run(
+#         "main:app",
+#         host="0.0.0.0",
+#         port=8000,
+#         reload=True,
+#         app_dir="src",
+#     )

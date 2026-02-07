@@ -132,16 +132,37 @@ export default function Home() {
   const [threads, setThreads] = useState<Thread[]>([]);
   const [isLoadingThreads, setIsLoadingThreads] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const [backendStatus, setBackendStatus] = useState<'connecting' | 'connected' | 'error'>('connecting');
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
 
+  const checkBackendStatus = async () => {
+    try {
+      const response = await fetch('http://localhost:8000/status');
+      if (response.ok) {
+        const data = await response.json();
+        if (data.status === 'connected') {
+          setBackendStatus('connected');
+        }
+      } else {
+        setBackendStatus('error');
+      }
+    } catch (error) {
+      setBackendStatus('error');
+    }
+  };
+
   useEffect(() => {
+    checkBackendStatus();
     fetchThreads();
     const savedTheme = localStorage.getItem('theme');
     if (savedTheme === 'dark') {
       setIsDarkMode(true);
       document.documentElement.setAttribute('data-theme', 'dark');
     }
+
+    const interval = setInterval(checkBackendStatus, 5000);
+    return () => clearInterval(interval);
   }, []);
 
   const toggleTheme = () => {
@@ -219,7 +240,7 @@ export default function Home() {
       });
       if (response.ok) {
         setThreads(prev => prev.filter(t => t.id !== id));
-        // If we're currently viewing this thread, start a new chat
+        // if we're currently viewing this thread, start a new chat
         if (threadId === id) {
           handleNewChat();
         }
@@ -281,7 +302,7 @@ export default function Home() {
         }
       }
 
-      // Mark streaming as complete
+      // mark streaming as complete
       setMessages(prev => prev.map((msg, i) =>
         i === prev.length - 1 && msg.role === 'assistant'
           ? { ...msg, responseTime: finalResponseTime, isStreaming: false }
@@ -304,7 +325,7 @@ export default function Home() {
   };
 
   const handleNewChat = async () => {
-    // Delete all threads with 0 messages
+    // delete all threads with 0 messages
     const emptyThreads = threads.filter(t => t.message_count === 0);
     
     for (const thread of emptyThreads) {
@@ -317,7 +338,7 @@ export default function Home() {
       }
     }
     
-    // Remove all empty threads from local state
+    // remove all empty threads from local state
     if (emptyThreads.length > 0) {
       const emptyThreadIds = new Set(emptyThreads.map(t => t.id));
       setThreads(prev => prev.filter(t => !emptyThreadIds.has(t.id)));
@@ -406,6 +427,16 @@ export default function Home() {
       </div>
 
       <div className="p-4 border-t border-[var(--border-primary)] space-y-2">
+        <div className="w-full flex items-center gap-3 px-3 py-2.5 text-[var(--text-secondary)] rounded-lg">
+          <div className={`w-4 h-4 rounded-full ${
+            backendStatus === 'connected' ? 'bg-green-500 animate-pulse' : 
+            backendStatus === 'error' ? 'bg-red-500 animate-pulse' : 'bg-yellow-500 animate-pulse'
+          }`} />
+          <span className="text-sm">
+            {backendStatus === 'connected' ? 'Connected' : 
+             backendStatus === 'error' ? 'Waiting for connection...' : 'Connecting...'}
+          </span>
+        </div>
         <button
           onClick={fetchThreads}
           className="w-full flex items-center gap-3 px-3 py-2.5 text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-secondary)] rounded-lg transition-all duration-200"

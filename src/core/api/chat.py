@@ -159,3 +159,8 @@ async def delete_thread(thread_id: str):
     del threads_store[thread_id]
     threads_list.remove(thread_id)
     return {"success": True}
+
+
+@router.get("/status")
+async def get_status():
+    return {"status": "connected"}

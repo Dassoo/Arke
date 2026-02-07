@@ -1,7 +1,7 @@
 from langchain.tools import tool
 
-from core.pipeline import RAGManager
-from utils.logging import logger
+from src.core.pipeline import RAGManager
+from src.utils.logging import logger
 
 from pathlib import Path
 

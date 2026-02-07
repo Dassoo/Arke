@@ -8,9 +8,9 @@ from langchain_qdrant import QdrantVectorStore
 from qdrant_client import QdrantClient
 from qdrant_client.http.models import Distance, VectorParams, Filter, FieldCondition, MatchValue
 
-from core.config import settings, config_model
-from core.prompts import SEARCH_PROMPT
-from utils.logging import logger
+from src.core.config import settings, config_model
+from src.core.prompts import SEARCH_PROMPT
+from src.utils.logging import logger
 
 import uuid
 

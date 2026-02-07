@@ -1,5 +1,5 @@
-from core.ingestion import DocumentProcessor
-from core.storage import QdrantVectorRepository
+from src.core.ingestion import DocumentProcessor
+from src.core.storage import QdrantVectorRepository
 
 from pathlib import Path
 

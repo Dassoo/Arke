@@ -28,6 +28,29 @@ services:
     volumes:
       - ./qdrant_data:/qdrant/storage. # Qdrant volume storage
 
+  app:
+    build: .
+    container_name: arke-app
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    volumes:
+      - ./data:/app/data # Mount data directory
+      - ./.env:/app/.env:ro  # Mount environment file
+    depends_on:
+      - redis
+      - qdrant
+    environment:
+      - REDIS_URL=redis://redis:6379
+      - QDRANT_URL=http://qdrant:6333
+    restart: unless-stopped
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:3000"
+    
 configs:
  qdrant_config:
     content: |

@@ -1,6 +1,6 @@
 from langchain_redis import RedisCache
 from langchain_classic.globals import set_llm_cache
-from core.config import settings
+from src.core.config import settings
 
 
 def init_llm_cache():

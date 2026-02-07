@@ -1,5 +1,5 @@
 from rich.logging import RichHandler
-from utils.console import console
+from src.utils.console import console
 import logging
 
 
