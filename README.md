@@ -70,7 +70,7 @@ Arke is a small personal project focused on building a local high-performance RA
 The RAG will be available at `http://localhost:3000` on your browser.
 
 You can now interact with the agent:
-   - **Store documents**: Specify local folder paths with the documents to add (providing a sample in 'data/greece_dataset')
+   - **Store documents**: Specify local folder paths with the documents to add (providing a sample in 'data/greece_dataset' on some Wikipedia pages about Ancient Greek history, art and architecture)
    - **Query knowledge base**: Ask questions about stored documents
    - **Manage documents**: View, delete stored documents or flush the database through natural language queries
 
