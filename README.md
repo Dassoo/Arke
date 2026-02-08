@@ -51,8 +51,6 @@ Arke is a small personal project focused on building a local high-performance RA
 
    Required variables:
    - `OPENAI_API_KEY`: Your OpenAI API key
-   - `REDIS_URL`: Redis connection URL (default:  `redis://localhost:6379`)
-   - `QDRANT_URL`: Qdrant connection URL (default:  `http://localhost:6333`)
 
 
 3. **Start Docker:**

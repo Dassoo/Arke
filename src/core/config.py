@@ -17,8 +17,10 @@ class Settings(BaseSettings):
     
     # --- API settings ---
     openai_api_key: SecretStr = SecretStr(Field(alias="OPENAI_API_KEY", default=""))
-    redis_url: str = Field(alias="REDIS_URL", default="redis://localhost:6379")
-    qdrant_url: str = Field(alias="QDRANT_URL", default="http://localhost:6333")
+    
+    # --- Storage settings ---
+    redis_url: str = "redis://localhost:6379"
+    qdrant_url: str = "http://localhost:6333"
     
     # --- Splitter settings ---
     splitter_type: Literal["recursive", "token"] = "recursive"

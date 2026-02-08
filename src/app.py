@@ -13,7 +13,7 @@ from src.agents import tools
 
 
 def validate_env(settings):
-    required = ["OPENAI_API_KEY", "REDIS_URL", "QDRANT_URL"]
+    required = ["OPENAI_API_KEY"]
     missing = [v for v in required if not getattr(settings, v.lower())]
     if missing:
         raise EnvironmentError(f"Missing env vars: {missing}")
