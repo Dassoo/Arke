@@ -14,7 +14,14 @@ from src.agents import tools
 
 def validate_env(settings):
     required = ["OPENAI_API_KEY"]
-    missing = [v for v in required if not getattr(settings, v.lower())]
+    missing = []
+    for v in required:
+        attr = getattr(settings, v.lower())
+        if hasattr(attr, 'get_secret_value'):
+            if not attr.get_secret_value():
+                missing.append(v)
+        elif not attr:
+            missing.append(v)
     if missing:
         raise EnvironmentError(f"Missing env vars: {missing}")
 

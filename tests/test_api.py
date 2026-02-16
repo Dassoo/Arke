@@ -7,13 +7,13 @@ import sys
 import os
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
-# Mock the cache before importing the app to avoid Redis connection
+# Mock cache
 with patch('src.core.cache.init_llm_cache'):
     from src.app import app
     from src.core.api.chat import init_chat_dependencies, threads_store, threads_list
 
 
-# Mock agent for testing
+# Mock agent
 class MockAgent:
     async def astream_events(self, *args, **kwargs):
         yield {
@@ -30,7 +30,6 @@ def client():
     
     init_chat_dependencies(mock_agent, mock_checkpointer)
     
-    # Create test client
     with TestClient(app) as c:
         yield c
 
