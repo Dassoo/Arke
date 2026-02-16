@@ -27,6 +27,26 @@ class DocumentProcessor:
         self.chunk_overlap = settings.chunk_overlap
         self.splitter_type = settings.splitter_type
     
+    def convert_to_lc_documents(self, results: list) -> list[Document]:
+        """Convert raw extraction results from Kreuzberg into LangChain Document objects.
+        
+        Args:
+            results (list): List of extraction results from Kreuzberg
+            
+        Returns:
+            list[Document]: List of LangChain Document objects with extracted content and metadata
+        """
+        return [
+                Document(
+                    page_content=result.content,
+                    metadata={
+                        k: str(v)
+                        for k, v in (result.metadata or {}).items()
+                    },
+                )
+                for result in results
+            ]
+    
     def load_documents_from_directory(self, input_path: Path) -> list[Document]:
         """
         Load all files from a specified directory into LangChain Document objects.
@@ -44,6 +64,9 @@ class DocumentProcessor:
         Raises:
             RuntimeError: If loading or extraction fails for any reason
         """
+        if not input_path.exists() or not input_path.is_dir():
+            raise RuntimeError(f"Input path {input_path} does not exist or is not a directory")
+        
         try:
             files: list[str | Path] = [f for f in input_path.glob("*") if f.is_file()]
             config = ExtractionConfig(
@@ -51,17 +74,7 @@ class DocumentProcessor:
             )
 
             results = batch_extract_files_sync(files, config=config)
-            
-            return [
-                Document(
-                    page_content=result.content,
-                    metadata={
-                        k: str(v)
-                        for k, v in (result.metadata or {}).items()
-                    },
-                )
-                for result in results
-            ]
+            return self.convert_to_lc_documents(results)
         except Exception as e:
             raise RuntimeError(f"Failed to load documents from {input_path}") from e
     

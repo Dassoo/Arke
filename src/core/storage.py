@@ -17,27 +17,29 @@ import uuid
 
 class QdrantVectorRepository:
     """
-    Manages document storage and retrieval using Qdrant as a vector database.
-    
-    This class provides an interface for storing document chunks as vector embeddings
-    in Qdrant, and retrieving relevant chunks using semantic search. It supports
-    operations like adding, deleting, and querying documents from the vector store.
-    
+    Handles storage and retrieval of document chunks in a Qdrant vector database.
+
+    This class provides an interface to:
+    - Store document chunks as vector embeddings in Qdrant.
+    - Retrieve relevant chunks using semantic search.
+    - Add, delete, or query documents from the vector store.
+
+    Designed with dependency injection in mind, it allows passing a custom 
+    Qdrant client for testing or alternative environments.
+
     Attributes:
-        index_name (str): Name of the Qdrant collection
-        qdrant_url (str): Connection URL for the Qdrant server
-        client (QdrantClient): Qdrant client instance
+        index_name (str): Name of the Qdrant collection.
+        qdrant_url (str): URL of the Qdrant server.
+        client (QdrantClient): Qdrant client instance used for all operations.
     """
-    def __init__(self, index_name: str = "my_docs"):
-        """
-        Initialize a Qdrant vector repository instance.
-        
-        Args:
-            index_name (str): Name of the collection to use (default: "my_docs")
-        """
-        self.index_name = index_name
-        self.qdrant_url = settings.qdrant_url
-        self.client = QdrantClient(url=self.qdrant_url)
+    def __init__(
+            self, client: QdrantClient | None = None, 
+            index_name: str = "my_docs", 
+            url: str | None = None
+        ):
+            self.index_name = index_name
+            self.qdrant_url = url or settings.qdrant_url
+            self.client = client or QdrantClient(url=self.qdrant_url)
     
     @property
     def embedder(self) -> CacheBackedEmbeddings:

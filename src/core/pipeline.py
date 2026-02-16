@@ -17,12 +17,6 @@ class RAGManager:
         vector_store (QdrantVectorRepository): Manages vector storage and retrieval
     """
     def __init__(self):
-        """
-        Initialize a RAGManager instance.
-        
-        Sets up the document processor and vector store connection using 
-        a vector database.
-        """
         self.document_manager = DocumentProcessor()
         self.vector_store = QdrantVectorRepository()
     
